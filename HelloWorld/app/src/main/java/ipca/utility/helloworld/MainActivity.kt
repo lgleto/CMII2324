@@ -11,24 +11,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
 
-        val textView = TextView(this)
-        textView.text = "Hello world!"
-        textView.textSize = 54.0f
-        val button = Button(this)
+        val textView = findViewById<TextView>(R.id.textView)
+        textView.text = "Olá mundo!"
 
-
-        val linearLayout = LinearLayout(this)
-        linearLayout.addView(textView)
-        linearLayout.addView(button)
-
-        setContentView(linearLayout)
-
-
-        button.text = "Traduzir"
+        val button = findViewById<Button>(R.id.button)
         button.setOnClickListener {
-            textView.text = "ola mundo"
+            textView.text = "Hello World!"
         }
-
     }
 }
