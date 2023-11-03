@@ -58,6 +58,11 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+
+    }
+
 
 
     var onButtonOperation : (View)->Unit = {
