@@ -16,6 +16,8 @@ class ProductDetailActivity : AppCompatActivity() {
                 binding.textViewQtt.text = value.toString()
             }
         }
+
+    var position : Int = -1
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProductDetailBinding.inflate(layoutInflater)
@@ -24,6 +26,7 @@ class ProductDetailActivity : AppCompatActivity() {
         intent.extras?.let {
             val name = it.getString("extra_name")
             val qtt = it.getInt("extra_qtt")
+            position=it.getInt("extra_position",-1)
             binding.editTextProductName.setText ( name)
             this@ProductDetailActivity.qtt = qtt
         }
@@ -38,6 +41,7 @@ class ProductDetailActivity : AppCompatActivity() {
             val intent = Intent()
             intent.putExtra("extra_name",binding.editTextProductName.text.toString())
             intent.putExtra("extra_qtt",qtt)
+            intent.putExtra("extra_position", position)
             setResult(RESULT_OK, intent)
             finish()
         }

@@ -30,7 +30,13 @@ class MainActivity : AppCompatActivity() {
             it.data?.let { data ->
                 val name = data.getStringExtra("extra_name")?:""
                 val qtt = data.getIntExtra("extra_qtt",0)
-                products.add(Product(name, qtt, false))
+                val position = data.getIntExtra("extra_position", -1)
+                if (position >= 0 ){
+                    products[position].name = name
+                    products[position].qtt = qtt
+                }else {
+                    products.add(Product(name, qtt, false))
+                }
                 adpapter.notifyDataSetChanged()
             }
         }
@@ -74,7 +80,8 @@ class MainActivity : AppCompatActivity() {
                 val intent = Intent(this@MainActivity, ProductDetailActivity::class.java)
                 intent.putExtra("extra_name", products[position].name)
                 intent.putExtra("extra_qtt", products[position].qtt)
-                startActivity(intent)
+                intent.putExtra("extra_position", position)
+                resultLauncher.launch(intent)
             }
             return rootView.root
         }
