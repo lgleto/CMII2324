@@ -10,18 +10,22 @@ import android.widget.BaseAdapter
 import android.widget.TextView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.lifecycleScope
 import ipca.utility.shoppinglist.databinding.ActivityMainBinding
 import ipca.utility.shoppinglist.databinding.RowProductBinding
 import ipca.utility.shoppinglist.model.Product
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import org.json.JSONArray
+import org.json.JSONObject
 
 
 class MainActivity : AppCompatActivity() {
 
-    val products = arrayListOf<Product>(
-        Product("Maça", 4, true),
-        Product("Arroz", 1, false),
-        Product("Leite", 8, false)
-    )
+    var products = arrayListOf<Product>()
 
     private lateinit var binding: ActivityMainBinding
     private  var  adpapter = ProductAdapter()
@@ -35,7 +39,7 @@ class MainActivity : AppCompatActivity() {
                     products[position].name = name
                     products[position].qtt = qtt
                 }else {
-                    products.add(Product(name, qtt, false))
+                    products.add(Product("",name, qtt, false))
                 }
                 adpapter.notifyDataSetChanged()
             }
@@ -52,9 +56,10 @@ class MainActivity : AppCompatActivity() {
             resultLauncher.launch(intent)
         }
 
-
-
-
+        Backend.fetchProducts(lifecycleScope) {
+            products = it
+            adpapter.notifyDataSetChanged()
+        }
 
     }
 

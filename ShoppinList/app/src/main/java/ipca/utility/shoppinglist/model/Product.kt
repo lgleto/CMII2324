@@ -1,13 +1,23 @@
 package ipca.utility.shoppinglist.model
 
-class Product {
-    var name : String
-    var qtt : Int
-    var isChecked : Boolean
+import org.json.JSONObject
 
-    constructor(name: String, qtt: Int, isChecked: Boolean) {
-        this.name = name
-        this.qtt = qtt
-        this.isChecked = isChecked
+data class Product (
+    var id          : String,
+    var name        : String,
+    var qtt         : Int,
+    var isChecked   : Boolean) {
+
+    companion object{
+
+        fun fromJson(jsonObject: JSONObject) : Product {
+            return Product(
+                jsonObject.get("id"         ) as String,
+                jsonObject.get("name"       ) as String,
+                jsonObject.get("qtt"        ) as Int,
+                jsonObject.get("isChecked"  ) as Boolean)
+        }
+
     }
+
 }
