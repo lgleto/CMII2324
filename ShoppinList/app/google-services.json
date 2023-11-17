@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "314647351948",
+    "project_id": "shoppinglistap-720ca",
+    "storage_bucket": "shoppinglistap-720ca.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:314647351948:android:73fc584ed6f1821d8721a9",
+        "android_client_info": {
+          "package_name": "ipca.utility.shoppinglist"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOHA_mdSJY5SXpZiNXVPmo23OLpK8KikU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

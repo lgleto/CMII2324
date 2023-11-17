@@ -24,9 +24,9 @@ class ProductDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         intent.extras?.let {
-            val name = it.getString("extra_name")
-            val qtt = it.getInt("extra_qtt")
-            position=it.getInt("extra_position",-1)
+            val name = it.getString(EXTRA_NAME)
+            val qtt = it.getInt(EXTRA_QTT)
+            position=it.getInt(EXTRA_POSITION,-1)
             binding.editTextProductName.setText ( name)
             this@ProductDetailActivity.qtt = qtt
         }
@@ -39,11 +39,17 @@ class ProductDetailActivity : AppCompatActivity() {
         }
         binding.buttonDone.setOnClickListener {
             val intent = Intent()
-            intent.putExtra("extra_name",binding.editTextProductName.text.toString())
-            intent.putExtra("extra_qtt",qtt)
-            intent.putExtra("extra_position", position)
+            intent.putExtra(EXTRA_NAME, binding.editTextProductName.text.toString())
+            intent.putExtra(EXTRA_QTT, qtt)
+            intent.putExtra(EXTRA_POSITION, position)
             setResult(RESULT_OK, intent)
             finish()
         }
+    }
+
+    companion object{
+        const val EXTRA_NAME = "extra_name"
+        const val EXTRA_QTT = "extra_qtt"
+        const val EXTRA_POSITION = "extra_position"
     }
 }

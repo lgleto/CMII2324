@@ -4,47 +4,29 @@ import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import android.widget.TextView
-import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.lifecycle.lifecycleScope
+import com.google.firebase.firestore.ktx.firestore
+import com.google.firebase.ktx.Firebase
 import ipca.utility.shoppinglist.databinding.ActivityMainBinding
+import ipca.utility.shoppinglist.databinding.RowListBinding
 import ipca.utility.shoppinglist.databinding.RowProductBinding
 import ipca.utility.shoppinglist.model.Product
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.launch
-import okhttp3.OkHttpClient
-import okhttp3.Request
-import org.json.JSONArray
-import org.json.JSONObject
+import ipca.utility.shoppinglist.model.ShoppingList
 
 
+const val TAG = "shoppinglist"
 class MainActivity : AppCompatActivity() {
 
-    var products = arrayListOf<Product>()
+    var shoppingLists = arrayListOf<ShoppingList>()
 
     private lateinit var binding: ActivityMainBinding
-    private  var  adpapter = ProductAdapter()
-    val resultLauncher =  registerForActivityResult(ActivityResultContracts.StartActivityForResult()){
-        if (it.resultCode == Activity.RESULT_OK){
-            it.data?.let { data ->
-                val name = data.getStringExtra("extra_name")?:""
-                val qtt = data.getIntExtra("extra_qtt",0)
-                val position = data.getIntExtra("extra_position", -1)
-                if (position >= 0 ){
-                    products[position].name = name
-                    products[position].qtt = qtt
-                }else {
-                    products.add(Product("",name, qtt, false))
-                }
-                adpapter.notifyDataSetChanged()
-            }
-        }
-    }
+    private  var  adpapter = ShoppingListAdapter()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -53,23 +35,40 @@ class MainActivity : AppCompatActivity() {
 
         binding.buttonAddProduct.setOnClickListener {
             val intent = Intent(this, ProductDetailActivity::class.java)
-            resultLauncher.launch(intent)
+            startActivity(intent)
         }
 
-        Backend.fetchProducts(lifecycleScope) {
-            products = it
-            adpapter.notifyDataSetChanged()
-        }
+        val db = Firebase.firestore
+        db.collection("shoppingLists")
+            .addSnapshotListener { snapshoot, error ->
+                snapshoot?.documents?.let {
+                    this.shoppingLists.clear()
+                    for (document in it) {
+                        document.data?.let{ data ->
+                            this.shoppingLists.add(
+                                ShoppingList.fromSnapshot(
+                                    document.id,
+                                    data
+                                )
+                            )
+                        }
+                    }
+                    this.adpapter.notifyDataSetChanged()
+                }
+
+
+            }
+
 
     }
 
-    inner class ProductAdapter : BaseAdapter() {
+    inner class ShoppingListAdapter : BaseAdapter() {
         override fun getCount(): Int {
-            return products.size
+            return shoppingLists.size
         }
 
         override fun getItem(position: Int): Any {
-            return products[position]
+            return shoppingLists[position]
         }
 
         override fun getItemId(position: Int): Long {
@@ -77,17 +76,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         override fun getView(position: Int, convertView: View?, parent: ViewGroup?): View {
-            val rootView = RowProductBinding.inflate(layoutInflater)
-            rootView.textViewProduct.text = products[position].name
-            rootView.textViewQtt.text = products[position].qtt.toString()
-            rootView.checkBox.isChecked = products[position].isChecked
-            rootView.root.setOnClickListener {
-                val intent = Intent(this@MainActivity, ProductDetailActivity::class.java)
-                intent.putExtra("extra_name", products[position].name)
-                intent.putExtra("extra_qtt", products[position].qtt)
-                intent.putExtra("extra_position", position)
-                resultLauncher.launch(intent)
-            }
+            val rootView = RowListBinding.inflate(layoutInflater)
+            rootView.textViewListName.text = shoppingLists[position].name
+
             return rootView.root
         }
 
