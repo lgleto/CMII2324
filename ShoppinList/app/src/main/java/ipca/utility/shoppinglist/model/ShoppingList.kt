@@ -7,6 +7,13 @@ data class ShoppingList (
     var name : String
 ){
 
+
+    fun toHasMap() : Map<String, Any>{
+        return hashMapOf(
+            "name" to name,
+        )
+    }
+
     companion object{
         fun fromSnapshot(id : String, snapshot: Map<String,Any>) : ShoppingList{
             return ShoppingList(id,

@@ -39,13 +39,15 @@ class ProductActivity : AppCompatActivity() {
             }
         }
     }
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
         binding.listViewProducts.adapter = adpapter
 
-        binding.buttonAddProduct.setOnClickListener {
+        binding.buttonAddList.setOnClickListener {
             val intent = Intent(this, ProductDetailActivity::class.java)
             resultLauncher.launch(intent)
         }
@@ -61,6 +63,8 @@ class ProductActivity : AppCompatActivity() {
             .addOnFailureListener { exception ->
                 Log.w(TAG, "Error getting documents.", exception)
             }
+
+
     }
 
     inner class ProductAdapter : BaseAdapter() {

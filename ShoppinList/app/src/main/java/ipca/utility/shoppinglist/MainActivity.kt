@@ -1,21 +1,15 @@
 package ipca.utility.shoppinglist
 
-import android.app.Activity
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import ipca.utility.shoppinglist.databinding.ActivityMainBinding
 import ipca.utility.shoppinglist.databinding.RowListBinding
-import ipca.utility.shoppinglist.databinding.RowProductBinding
-import ipca.utility.shoppinglist.model.Product
 import ipca.utility.shoppinglist.model.ShoppingList
 
 
@@ -33,8 +27,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
         binding.listViewProducts.adapter = adpapter
 
-        binding.buttonAddProduct.setOnClickListener {
-            val intent = Intent(this, ProductDetailActivity::class.java)
+        binding.buttonAddList.setOnClickListener {
+            val intent = Intent(this, ShoppingListDetailActivity::class.java)
             startActivity(intent)
         }
 

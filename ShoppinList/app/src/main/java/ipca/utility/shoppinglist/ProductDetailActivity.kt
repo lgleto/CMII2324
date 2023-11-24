@@ -18,6 +18,7 @@ class ProductDetailActivity : AppCompatActivity() {
         }
 
     var position : Int = -1
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityProductDetailBinding.inflate(layoutInflater)
@@ -45,6 +46,7 @@ class ProductDetailActivity : AppCompatActivity() {
             setResult(RESULT_OK, intent)
             finish()
         }
+
     }
 
     companion object{
