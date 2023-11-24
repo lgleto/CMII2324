@@ -39,7 +39,7 @@ class LoginActivity : AppCompatActivity() {
                         Log.w(TAG, "signInWithEmail:failure", task.exception)
                         Toast.makeText(
                             baseContext,
-                            "Authentication failed.",
+                            resources.getString(R.string.authentication_failed),
                             Toast.LENGTH_SHORT,
                         ).show()
 

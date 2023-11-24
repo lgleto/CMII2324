@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">ShoppingList</string>
+    <string name="email">e-mail</string>
+    <string name="password">palavra passe</string>
+    <string name="login">Entrar</string>
+    <string name="register">Registar</string>
+    <string name="authentication_failed">Erro na autenticação</string>
+</resources>
