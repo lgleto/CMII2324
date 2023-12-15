@@ -3,16 +3,17 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-feature android:name="android.hardware.camera"
+
+    <uses-feature
+        android:name="android.hardware.camera"
         android:required="true" />
+
     <uses-permission
         android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
     <uses-permission
         android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-
-
 
     <application
         android:allowBackup="true"
@@ -25,6 +26,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.ShoppingList"
         tools:targetApi="31">
+        <activity
+            android:name=".HomeActivity"
+            android:exported="false"
+            android:label="@string/title_activity_home" />
+
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="ipca.utility.shoppinglist.fileprovider"
@@ -37,7 +43,7 @@
 
         <activity
             android:name=".LoginActivity"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -45,16 +51,14 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".ShoppingListDetailActivity"
+            android:name=".ui.home.ShoppingListDetailFragment"
             android:exported="false" />
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".ui.home.ProductDetailFragment"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
-
-        </activity>
+            android:exported="true"></activity>
     </application>
 
 </manifest>

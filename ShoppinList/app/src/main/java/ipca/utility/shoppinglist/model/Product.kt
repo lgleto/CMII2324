@@ -1,23 +1,31 @@
 package ipca.utility.shoppinglist.model
 
-import org.json.JSONObject
-
 data class Product (
-    var id          : String,
-    var name        : String,
-    var qtt         : Int,
-    var isChecked   : Boolean) {
+    var id : String?,
+    var name : String,
+    var qtt : Long,
+    var isChecked : Boolean = false){
 
-    companion object{
-
-        fun fromJson(jsonObject: JSONObject) : Product {
-            return Product(
-                jsonObject.get("id"         ) as String,
-                jsonObject.get("name"       ) as String,
-                jsonObject.get("qtt"        ) as Int,
-                jsonObject.get("isChecked"  ) as Boolean)
-        }
-
+    fun toMap(): HashMap<String, Any?> {
+        return hashMapOf(
+            "id" to id,
+            "name" to name,
+            "qtt" to qtt,
+            "isChecked" to isChecked,
+        )
     }
 
+    companion object{
+        fun fromSnapshot(docId :String, snap : Map<String,Any?>) : Product {
+            val name  = snap["name"] as String
+            val qtt  = snap["qtt"] as Long
+            val isChecked  = snap["isChecked"] as Boolean
+            return  Product(
+                docId,
+                name,
+                qtt,
+                isChecked
+            )
+        }
+    }
 }

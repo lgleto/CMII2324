@@ -1,41 +1,53 @@
-package ipca.utility.shoppinglist
+package ipca.utility.shoppinglist.ui.home
 
 import android.app.Activity
-import android.content.ActivityNotFoundException
 import android.content.Intent
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Environment
 import android.provider.MediaStore
 import android.util.Log
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.FileProvider
-import androidx.lifecycle.lifecycleScope
+import androidx.fragment.app.Fragment
+import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
 import com.google.firebase.storage.ktx.storage
-import ipca.utility.shoppinglist.databinding.ActivityShoppongListDetailBinding
+import ipca.utility.shoppinglist.TAG
+import ipca.utility.shoppinglist.databinding.FragmentShoppingListDetailBinding
 import ipca.utility.shoppinglist.model.ShoppingList
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.io.File
 import java.io.IOException
-import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.UUID
 
-class ShoppingListDetailActivity : AppCompatActivity() {
+class ShoppingListDetailFragment : Fragment() {
+
+    private var _binding: FragmentShoppingListDetailBinding? = null
+    private val binding get() = _binding!!
 
     val db = Firebase.firestore
 
-    private lateinit var binding: ActivityShoppongListDetailBinding
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        binding = ActivityShoppongListDetailBinding.inflate(layoutInflater)
-        setContentView(binding.root)
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        _binding = FragmentShoppingListDetailBinding.inflate(inflater, container, false)
+        return binding.root
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         binding.buttonDone.setOnClickListener {
             addShoppingList(ShoppingList("",
@@ -75,12 +87,12 @@ class ShoppingListDetailActivity : AppCompatActivity() {
                 .add(data)
                 .addOnSuccessListener { documentReference ->
                     Log.d(TAG, "DocumentSnapshot written with ID: ${documentReference.id}")
-                    Toast.makeText(this, "List added", Toast.LENGTH_LONG).show()
-                    finish()
+                    Toast.makeText(requireContext(), "List added", Toast.LENGTH_LONG).show()
+                    findNavController().popBackStack()
                 }
                 .addOnFailureListener { e ->
                     Log.w(TAG, "Error adding document", e)
-                    Toast.makeText(this, "No internet!", Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireContext(), "No internet!", Toast.LENGTH_LONG).show()
                 }
         }
 
@@ -109,7 +121,7 @@ class ShoppingListDetailActivity : AppCompatActivity() {
     private fun createImageFile(): File {
         // Create an image file name
         val timeStamp: String = UUID.randomUUID().toString()
-        val storageDir: File = getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
+        val storageDir: File = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)!!
         return File.createTempFile(
             "JPEG_${timeStamp}_", /* prefix */
             ".jpg", /* suffix */
@@ -122,7 +134,7 @@ class ShoppingListDetailActivity : AppCompatActivity() {
 
     private fun dispatchTakePictureIntent() {
         Intent(MediaStore.ACTION_IMAGE_CAPTURE).also { takePictureIntent ->
-            takePictureIntent.resolveActivity(this@ShoppingListDetailActivity.packageManager).also {
+            takePictureIntent.resolveActivity(requireContext().packageManager).also {
                 val photoFile: File? = try {
                     createImageFile()
                 } catch (ex: IOException) {
@@ -130,7 +142,7 @@ class ShoppingListDetailActivity : AppCompatActivity() {
                 }
                 photoFile?.also {
                     val photoURI: Uri = FileProvider.getUriForFile(
-                        this@ShoppingListDetailActivity,
+                        requireContext(),
                         "ipca.utility.shoppinglist.fileprovider",
                         it
                     )

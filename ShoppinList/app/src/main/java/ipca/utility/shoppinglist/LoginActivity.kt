@@ -9,7 +9,6 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import ipca.utility.shoppinglist.databinding.ActivityLoginBinding
-import ipca.utility.shoppinglist.databinding.ActivityShoppongListDetailBinding
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -27,7 +26,7 @@ class LoginActivity : AppCompatActivity() {
             Thread.sleep(1000)
             GlobalScope.launch(Dispatchers.Main) {
                 if (auth.currentUser != null){
-                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                     startActivity(intent)
                 }
             }
@@ -50,7 +49,7 @@ class LoginActivity : AppCompatActivity() {
                         // Sign in success, update UI with the signed-in user's information
                         Log.d(TAG, "signInWithEmail:success")
                         val user = auth.currentUser
-                        val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                        val intent = Intent(this@LoginActivity, HomeActivity::class.java)
                         startActivity(intent)
                     } else {
                         // If sign in fails, display a message to the user.
