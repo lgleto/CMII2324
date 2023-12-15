@@ -10,6 +10,9 @@ import com.google.firebase.auth.ktx.auth
 import com.google.firebase.ktx.Firebase
 import ipca.utility.shoppinglist.databinding.ActivityLoginBinding
 import ipca.utility.shoppinglist.databinding.ActivityShoppongListDetailBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
@@ -19,7 +22,22 @@ class LoginActivity : AppCompatActivity() {
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+
+        GlobalScope.launch(Dispatchers.IO) {
+            Thread.sleep(1000)
+            GlobalScope.launch(Dispatchers.Main) {
+                if (auth.currentUser != null){
+                    val intent = Intent(this@LoginActivity, MainActivity::class.java)
+                    startActivity(intent)
+                }
+            }
+        }
+
+
+
         auth = Firebase.auth
+
+
 
         binding.buttonLogin.setOnClickListener {
 
