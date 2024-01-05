@@ -31,7 +31,7 @@ class HomeActivity : AppCompatActivity() {
                 R.id.navigation_home, R.id.navigation_profile
             )
         )
-        setupActionBarWithNavController(navController, appBarConfiguration)
+        setSupportActionBar(binding.toolbar)
         navView.setupWithNavController(navController)
     }
 }

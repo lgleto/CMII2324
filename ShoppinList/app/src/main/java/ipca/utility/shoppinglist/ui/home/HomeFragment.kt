@@ -1,11 +1,17 @@
 package ipca.utility.shoppinglist.ui.home
 
+import android.app.SearchManager
+import android.content.Context
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.view.LayoutInflater
+import android.view.Menu
+import android.view.MenuInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseAdapter
+import androidx.appcompat.widget.SearchView
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.findNavController
 import com.google.firebase.firestore.ktx.firestore
@@ -15,6 +21,7 @@ import ipca.utility.shoppinglist.R
 import ipca.utility.shoppinglist.databinding.FragmentHomeBinding
 import ipca.utility.shoppinglist.databinding.RowListBinding
 import ipca.utility.shoppinglist.model.ShoppingList
+import ipca.utility.shoppinglist.removeAccentsLowerCase
 
 class HomeFragment : Fragment() {
 
@@ -49,7 +56,8 @@ class HomeFragment : Fragment() {
 
         val db = Firebase.firestore
         db.collection("shoppingLists")
-            .addSnapshotListener { snapshoot, error ->
+            .get()
+            .addOnSuccessListener  { snapshoot ->
                 snapshoot?.documents?.let {
                     this.shoppingLists.clear()
                     for (document in it) {
@@ -67,7 +75,72 @@ class HomeFragment : Fragment() {
 
 
             }
+        setHasOptionsMenu(true)
+    }
 
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return super.onOptionsItemSelected(item)
+    }
+
+    private var mScanning = false
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.menu_search, menu)
+
+        if (!mScanning) {
+            menu.findItem(R.id.menu_refresh).actionView = null
+        } else {
+            menu.findItem(R.id.menu_refresh).setActionView(
+                R.layout.actionbar_indeterminate_progress)
+        }
+
+        val searchManager = requireActivity().getSystemService(Context.SEARCH_SERVICE) as SearchManager?
+        val searchView = menu.findItem(R.id.menu_search).actionView as SearchView
+        searchView.setSearchableInfo(
+            searchManager!!.getSearchableInfo(requireActivity().componentName)
+        )
+
+        val queryTextListener: SearchView.OnQueryTextListener =
+            object : SearchView.OnQueryTextListener {
+                override fun onQueryTextChange(newText: String): Boolean {
+                    searchList(newText)
+                    return true
+                }
+
+                override fun onQueryTextSubmit(query: String): Boolean {
+                    searchList(query)
+                    return true
+                }
+            }
+        searchView.setOnQueryTextListener(queryTextListener)
+    }
+
+    fun searchList( search: String) {
+        val db = Firebase.firestore
+        db.collection("shoppingLists")
+            .whereGreaterThanOrEqualTo("name_search", search.removeAccentsLowerCase())
+            .whereLessThanOrEqualTo("name_search", search.removeAccentsLowerCase() + '\uf8ff')
+
+            .get()
+            .addOnSuccessListener  { snapshoot ->
+                snapshoot?.documents?.let {
+                    this.shoppingLists.clear()
+                    for (document in it) {
+                        document.data?.let{ data ->
+                            this.shoppingLists.add(
+                                ShoppingList.fromSnapshot(
+                                    document.id,
+                                    data
+                                )
+                            )
+                        }
+                    }
+                    this.adpapter.notifyDataSetChanged()
+                }
+
+
+            }
     }
 
     inner class ShoppingListAdapter : BaseAdapter() {

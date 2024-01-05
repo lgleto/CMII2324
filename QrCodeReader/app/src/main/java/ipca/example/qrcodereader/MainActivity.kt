@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
                 binding.textView.text = it?:"Sem resultados"
             }
         }
-
     }
 
     private fun askForCameraPermission() {
@@ -69,8 +68,5 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
-
-
-
 
 }
