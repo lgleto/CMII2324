@@ -5,7 +5,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.activity.result.ActivityResult
+import androidx.lifecycle.lifecycleScope
 import ipca.utility.shoppinglist.databinding.ActivityProductDetailBinding
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import java.util.UUID
 
 class ProductDetailActivity : AppCompatActivity() {
 
@@ -19,7 +23,7 @@ class ProductDetailActivity : AppCompatActivity() {
 
     private lateinit var binding : ActivityProductDetailBinding
 
-    var position : Int = -1
+    var product : Product? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -27,11 +31,19 @@ class ProductDetailActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         intent.extras?.let {
-            position = it.getInt(DATA_POSITION, -1)
-            qtd = it.getInt(DATA_QTD)
-            val name = it.getString(DATA_NAME)
-            binding.editTextProductName.setText(name)
-
+            val uid = it.getLong(PRODUCT_ID, -1)
+            lifecycleScope.launch (Dispatchers.IO){
+                product = AppDatabase
+                    .getInstance(this@ProductDetailActivity)
+                    ?.productDao()
+                    ?.get(uid)
+                lifecycleScope.launch (Dispatchers.Main){
+                    product?.let {
+                        qtd = it.qtd
+                        binding.editTextProductName.setText(it.name)
+                    }
+                }
+            }
         }
 
         binding.buttonIncrement.setOnClickListener {
@@ -43,20 +55,26 @@ class ProductDetailActivity : AppCompatActivity() {
         }
 
         binding.buttonDone.setOnClickListener {
-            val intent = Intent()
-            intent.putExtra(DATA_QTD, qtd)
-            intent.putExtra(DATA_NAME , binding.editTextProductName.text.toString())
-            intent.putExtra(DATA_POSITION ,position)
-            setResult(Activity.RESULT_OK, intent)
-            finish()
+            lifecycleScope.launch(Dispatchers.IO) {
+                AppDatabase.getInstance(this@ProductDetailActivity)?.productDao()?.add(
+                    Product(
+                        if (product==null) System.currentTimeMillis() else product!!.uid,
+                        binding.editTextProductName.text.toString(),
+                        qtd,
+                        product?.isChecked?:false
+                    )
+                )
+                lifecycleScope.launch(Dispatchers.Main) {
+                    setResult(RESULT_OK)
+                    finish()
+                }
+            }
         }
 
     }
 
     companion object {
-        const val DATA_NAME = "data_name"
-        const val DATA_QTD  = "data_qtd"
-        const val DATA_POSITION = "data_position"
+        const val PRODUCT_ID = "product_id"
     }
 
 

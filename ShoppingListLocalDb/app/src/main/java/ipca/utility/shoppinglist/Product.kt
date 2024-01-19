@@ -1,5 +1,6 @@
 package ipca.utility.shoppinglist
 
+import androidx.lifecycle.LiveData
 import androidx.room.Dao
 import androidx.room.Delete
 import androidx.room.Entity
@@ -21,7 +22,7 @@ data class Product(
 interface ProductDao {
 
     @Query("SELECT * FROM product")
-    fun getAll() : List<Product>
+    fun getAll() : LiveData<List<Product>>
 
     @Query("SELECT * FROM product WHERE uid = :uid")
     fun get(uid : Long) : Product

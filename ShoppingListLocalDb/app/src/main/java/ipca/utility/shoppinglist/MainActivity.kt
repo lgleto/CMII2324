@@ -25,49 +25,6 @@ class MainActivity : AppCompatActivity() {
 
     val productAdapter = ProductListAdapter()
 
-    val resultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-        if (it.resultCode == Activity.RESULT_OK) {
-            val data = it.data
-            data?.let {
-                val qtd = it.extras?.getInt(ProductDetailActivity.DATA_QTD)
-                val productName = it.extras?.getString(ProductDetailActivity.DATA_NAME)
-                val position = it.extras?.getInt(ProductDetailActivity.DATA_POSITION)?:-1
-                println("Product:${qtd} ${productName}")
-                if (position == -1) {
-                    val newProduct = Product(
-                        System.currentTimeMillis(),
-                        productName,
-                        qtd ?: 0)
-
-
-
-
-                    lifecycleScope.launch (Dispatchers.IO){
-
-                        AppDatabase.getInstance(this@MainActivity)
-                            ?.productDao()
-                            ?.add(newProduct)
-
-
-                        productList = AppDatabase
-                            .getInstance(this@MainActivity )
-                            ?.productDao()
-                            ?.getAll()?: arrayListOf()
-                        lifecycleScope.launch (Dispatchers.Main){
-                            productAdapter.notifyDataSetChanged()
-                        }
-                    }
-                }else{
-                    productList[position].name = productName
-                    productList[position].qtd = qtd?:0
-
-                }
-
-                productAdapter.notifyDataSetChanged()
-            }
-        }
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -77,18 +34,16 @@ class MainActivity : AppCompatActivity() {
         val buttonAdd = findViewById<Button>(R.id.buttonAdd)
         buttonAdd.setOnClickListener {
             val intent = Intent(this, ProductDetailActivity::class.java)
-            resultLauncher.launch(intent)
+            startActivity(intent)
         }
 
-        lifecycleScope.launch (Dispatchers.IO){
-            productList = AppDatabase
-                .getInstance(this@MainActivity )
-                ?.productDao()
-                ?.getAll()?: arrayListOf()
-            lifecycleScope.launch (Dispatchers.Main){
+        AppDatabase
+            .getInstance(this@MainActivity )
+            ?.productDao()
+            ?.getAll()?.observe(this, Observer {
+                productList = it
                 productAdapter.notifyDataSetChanged()
-            }
-        }
+            })
 
     }
 
@@ -116,16 +71,22 @@ class MainActivity : AppCompatActivity() {
             checkBox.isChecked = productList[position].isChecked
 
             checkBox.setOnClickListener {
-                productList[position].isChecked = checkBox.isChecked
-
+                lifecycleScope.launch(Dispatchers.IO) {
+                    AppDatabase.getInstance(this@MainActivity)?.productDao()?.add(
+                        Product(
+                            productList[position].uid,
+                            productList[position].name,
+                            productList[position].qtd,
+                            checkBox.isChecked
+                        )
+                    )
+                }
             }
 
             rootView.setOnClickListener{
                 val intent = Intent(this@MainActivity, ProductDetailActivity::class.java)
-                intent.putExtra(ProductDetailActivity.DATA_QTD, productList[position].qtd)
-                intent.putExtra(ProductDetailActivity.DATA_NAME, productList[position].name)
-                intent.putExtra(ProductDetailActivity.DATA_POSITION, position)
-                resultLauncher.launch(intent)
+                intent.putExtra(ProductDetailActivity.PRODUCT_ID, productList[position].uid)
+                startActivity(intent)
             }
 
             return rootView
